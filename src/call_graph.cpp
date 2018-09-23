@@ -14,6 +14,7 @@ CallGraph::CallGraph()
 CallGraph::~CallGraph()
 {
 	deleteDefun();
+	deleteLexem(firstLexem);
 }
 
 void CallGraph::create(Lexem* x)

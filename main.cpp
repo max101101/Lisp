@@ -8,12 +8,12 @@ int main(int argc, char** argv){
 		printf("Use: [prog] [inputFile]\n");
 		return 1;
 	}
-	Lexer a;
 	FILE* file = fopen(argv[1], "r");
-	Lexem* first = a.start(file);
-	CallGraph b;
-	b.create(first);
-	deleteLexem(first);
+	if(file == NULL){
+		perror("Open file\n");
+		return 1;
+	}
+	CallGraph().create(Lexer().start(file));
 	fclose(file);
 	return 0;
 }
