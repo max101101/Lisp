@@ -1,2 +1,2 @@
-make prog
+make
 ./prog lisp/*

@@ -1,24 +1,32 @@
-MODULES_NAMES = lexem.cpp lisp_lexer.cpp call_graph.cpp
-INCLUDE_PATH = include
-MODULES_PATH = src
-OBJ_PATH = obj
-SRCMODULES = $(MODULES_NAMES:%=$(MODULES_PATH)/%)
-OBJMODULES = $(MODULES_NAMES:%.cpp=$(OBJ_PATH)/%.o)
+MODULESNAMES = lexem.cpp lisp_lexer.cpp call_graph.cpp
+INCLUDEPATH = include
+MODULESPATH = src
+OBJPATH = obj
+MAINMODULE = main.cpp
+PROGNAME = prog
+SRCMODULES = $(MODULESNAMES:%=$(MODULESPATH)/%)
+OBJMODULES = $(MODULESNAMES:%.cpp=$(OBJPATH)/%.o)
 CXXFLAGS = -g -Wall
+
+.PHONY: all clean
+
+all: $(OBJPATH) $(PROGNAME)
 
 ifneq (clean, $(MAKECMDGOALS))
 -include deps.mk
 endif
 
 deps.mk: $(SRCMODULES)
-	mkdir -p $(OBJ_PATH)
-	$(CXX) -I$(INCLUDE_PATH) -MM $^ > $@
+	$(CXX) -I$(INCLUDEPATH) -MM $^ > $@
 
-$(OBJ_PATH)/%.o: $(MODULES_PATH)/%.cpp $(INCLUDE_PATH)/%.hpp
-	$(CXX) $(CXXFLAGS) -I$(INCLUDE_PATH) -c $< -o $@
+$(OBJPATH):
+	mkdir -p $@
 
-prog: main.cpp $(OBJMODULES)
-	$(CXX) $(CXXFLAGS) -I$(INCLUDE_PATH) $^ -o $@
+$(OBJPATH)/%.o: $(MODULESPATH)/%.cpp $(INCLUDEPATH)/%.hpp
+	$(CXX) $(CXXFLAGS) -I$(INCLUDEPATH) -c $< -o $@
+
+$(PROGNAME): $(MAINMODULE) $(OBJMODULES)
+	$(CXX) $(CXXFLAGS) -I$(INCLUDEPATH) $^ -o $@
 
 clean:
-	rm -rf obj prog deps.mk prog.dSYM
+	rm -rf $(OBJPATH) $(PROGNAME) deps.mk $(PROGNAME).dSYM
