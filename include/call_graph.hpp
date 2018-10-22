@@ -17,9 +17,9 @@ public:
 	~CallGraph();
 	void create(Lexem*);
 private:
-	void addDefun(char*);
+	void addDefun(const char*);
 	void createDefun();
-	void printDefun();
+	void printDefun() const;
 	void deleteDefun();
 };
 

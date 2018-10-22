@@ -5,7 +5,7 @@
 #include <lexem.hpp>
 
 struct Buffer{
-  char *buf;
+  char* buf;
   int pos;
   int len;
 };
@@ -22,7 +22,7 @@ public:
   ~Lexer();
   Lexem* start(FILE*);
 private: 
-  int cIsSplitter();
+  int cIsSplitter() const;
   void increaseBuffer();
   void symbolToBuffer();
   void createLexem(statement);

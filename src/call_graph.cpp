@@ -23,7 +23,7 @@ void CallGraph::create(Lexem* x)
 	printDefun();
 }
 
-void CallGraph::addDefun(char* function)
+void CallGraph::addDefun(const char* function)
 {
 	int i = 0;
 	int len = strlen(function);
@@ -50,7 +50,7 @@ void CallGraph::createDefun()
 	}
 }
 
-void CallGraph::printDefun()
+void CallGraph::printDefun() const
 {
 	Defun* tmp = firstDefun;
 	while(tmp){

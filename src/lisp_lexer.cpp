@@ -19,16 +19,16 @@ Lexer::~Lexer()
   delete [] buf.buf;
 }
 
-Lexem* Lexer::start(FILE* x)
+Lexem* Lexer::start(FILE* input)
 {
-  file = x;
+  file = input;
   while((c = getc(file)) != EOF){
     baseStatement();
   }
   return first;
 }
 
-int Lexer::cIsSplitter()
+int Lexer::cIsSplitter() const
 {
   int i = 0;
   for(i = 0; i < (strlen(splitter)); ++i){

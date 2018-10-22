@@ -1,7 +1,7 @@
 #include <cstdio>
 #include <lexem.hpp>
 
-void printLexem(Lexem *pointer, FILE* stream)
+void printLexem(const Lexem* pointer, FILE* stream)
 {
   while(pointer){
     fprintf(stream, "%s  %d\n", pointer->word, pointer->type);
@@ -9,7 +9,7 @@ void printLexem(Lexem *pointer, FILE* stream)
   }
 }
 
-void deleteLexem(Lexem *pointer)
+void deleteLexem(Lexem* pointer)
 {
   while(pointer){
     Lexem* tmp = pointer;
