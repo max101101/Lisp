@@ -8,12 +8,20 @@ int main(int argc, char** argv){
 		printf("Use: [prog] [inputFile]\n");
 		return 1;
 	}
-	FILE* file = fopen(argv[1], "r");
-	if(file == NULL){
-		perror("Open file\n");
-		return 1;
+	for(int i = 1; i < argc; ++i){
+		FILE* fileIn = fopen(argv[i], "r");
+		if(fileIn == NULL){
+			perror("Open file\n");
+			return 1;
+		}
+		/*FILE* fileOut = fopen(argv[i], "w");
+		if(fileOut == NULL){
+			perror("Open file\n");
+			return 1;
+		}*/
+		CallGraph().create(Lexer().start(fileIn));
+		fclose(fileIn);
+		//fclose(fileOut);
 	}
-	CallGraph().create(Lexer().start(file));
-	fclose(file);
 	return 0;
 }

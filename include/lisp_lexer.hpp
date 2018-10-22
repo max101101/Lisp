@@ -20,12 +20,12 @@ class Lexer{
 public:
   Lexer();
   ~Lexer();
-  Lexem* start(FILE *x);
+  Lexem* start(FILE*);
 private: 
   int cIsSplitter();
   void increaseBuffer();
   void symbolToBuffer();
-  void createLexem(statement type);
+  void createLexem(statement);
   void baseStatement();
   void wordStatement();
   void stringStatement();

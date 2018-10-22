@@ -1,10 +1,10 @@
 #include <cstdio>
 #include <lexem.hpp>
 
-void printLexem(Lexem *pointer)
+void printLexem(Lexem *pointer, FILE* stream)
 {
   while(pointer){
-    printf("%s  %d\n", pointer->word, pointer->type);
+    fprintf(stream, "%s  %d\n", pointer->word, pointer->type);
     pointer = pointer->next;
   }
 }

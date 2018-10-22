@@ -11,14 +11,14 @@ ifneq (clean, $(MAKECMDGOALS))
 endif
 
 deps.mk: $(SRCMODULES)
+	mkdir -p $(OBJ_PATH)
 	$(CXX) -I$(INCLUDE_PATH) -MM $^ > $@
 
-clean:
-	rm -rf obj prog deps.mk prog.dSYM
-
 $(OBJ_PATH)/%.o: $(MODULES_PATH)/%.cpp $(INCLUDE_PATH)/%.hpp
-	mkdir -p $(OBJ_PATH)
 	$(CXX) $(CXXFLAGS) -I$(INCLUDE_PATH) -c $< -o $@
 
 prog: main.cpp $(OBJMODULES)
 	$(CXX) $(CXXFLAGS) -I$(INCLUDE_PATH) $^ -o $@
+
+clean:
+	rm -rf obj prog deps.mk prog.dSYM

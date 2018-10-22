@@ -15,9 +15,9 @@ class CallGraph{
 public:
 	CallGraph();
 	~CallGraph();
-	void create(Lexem* x);
+	void create(Lexem*);
 private:
-	void addDefun(char* function);
+	void addDefun(char*);
 	void createDefun();
 	void printDefun();
 	void deleteDefun();

@@ -13,7 +13,7 @@ struct Lexem{
   Lexem* next;
 };
 
-void printLexem(Lexem* pointer);
-void deleteLexem(Lexem* pointer);
+void printLexem(Lexem*);
+void deleteLexem(Lexem*);
 
 #endif
