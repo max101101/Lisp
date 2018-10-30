@@ -5,6 +5,7 @@
 
 struct Defun{
 	char* function;
+	int number;
 	Defun* next;
 };
 
@@ -17,7 +18,8 @@ public:
 	~CallGraph();
 	void create(Lexem*);
 private:
-	void addDefun(const char*);
+	void addDefun(const char*, int);
+	int paramDefun(Lexem*, bool) const;
 	void createDefun();
 	void printDefun() const;
 	void deleteDefun();

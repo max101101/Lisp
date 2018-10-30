@@ -30,6 +30,7 @@ private:
   void wordStatement();
   void stringStatement();
   void commentStatement();
+  void specialStatement();
 };
 
 #endif

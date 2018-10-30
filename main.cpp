@@ -19,8 +19,10 @@ int main(int argc, char** argv){
 			perror("Open file\n");
 			return 1;
 		}*/
+		printf("%s:\n", argv[i]);
 		CallGraph().create(Lexer().start(fileIn));
 		fclose(fileIn);
+		printf("\n");
 		//fclose(fileOut);
 	}
 	return 0;

@@ -11,7 +11,7 @@ Lexer::Lexer()
   file = NULL;
   first = NULL;
   current = &first;
-  splitter = " \r\n\t\'\"();#";
+  splitter = " \r\n\t\'\"();";
 }
 
 Lexer::~Lexer()
@@ -93,6 +93,9 @@ void Lexer::baseStatement()
     createLexem(Splitter);
     return;
   }
+  if(c == '#'){
+	specialStatement();
+  }
   wordStatement();
 }
 
@@ -133,4 +136,27 @@ void Lexer::commentStatement()
     if((c == '\n') || (c == EOF))
       break;
   }
+}
+
+void Lexer::specialStatement()
+{
+  symbolToBuffer();
+  c = getc(file);
+  symbolToBuffer();
+  if(c == '\\'){
+    c = getc(file);
+    symbolToBuffer();
+  }
+  while(true){
+      c = getc(file);
+      if(c == EOF){
+        break;
+      }
+      if(cIsSplitter()){
+        ungetc(c, file);
+		break;
+      }
+      symbolToBuffer();
+  }
+  createLexem(String);
 }

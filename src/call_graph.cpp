@@ -16,14 +16,14 @@ CallGraph::~CallGraph()
 	deleteLexem(firstLexem);
 }
 
-void CallGraph::create(Lexem* x)
+void CallGraph::create(Lexem* first)
 {
-	firstLexem = x;
+	firstLexem = first;
 	createDefun();
 	printDefun();
 }
 
-void CallGraph::addDefun(const char* function)
+void CallGraph::addDefun(const char* function, int number)
 {
 	int i = 0;
 	int len = strlen(function);
@@ -32,8 +32,32 @@ void CallGraph::addDefun(const char* function)
 	for(i = 0; i <= len; ++i){
 		((*currentDefun)->function)[i] = function[i];
 	}
+	(*currentDefun)->number = number;
 	(*currentDefun)->next = NULL;
 	currentDefun = &((*currentDefun)->next);
+}
+
+int CallGraph::paramDefun(Lexem* lexem, bool isSheme) const
+{
+	Lexem* tmp = lexem;
+	int count = 0;
+	int balance = 0;
+	if(isSheme){
+		balance = 1;
+	}
+	while(tmp){
+		if(((strcmp(tmp->word, ")")) == 0) && (tmp->type == Splitter)){
+			if(--balance == 0)
+				return count;
+		} else if(((strcmp(tmp->word, "(")) == 0) && (tmp->type == Splitter)){
+			balance++;
+		} else{
+			if(tmp->word[0] != '&')
+				count++;
+		}
+		tmp = tmp->next;
+	}
+	return count;
 }
 
 void CallGraph::createDefun()
@@ -44,7 +68,16 @@ void CallGraph::createDefun()
 			tmp = tmp->next;
 			if(tmp == NULL)
 				break;
-			addDefun(tmp->word);
+			addDefun(tmp->word, paramDefun(tmp->next, false));
+		}
+		if(((strcmp(tmp->word, "define")) == 0) && (tmp->type == Word)){
+			tmp = tmp->next;
+			if(tmp == NULL)
+				break;
+			tmp = tmp->next;
+			if(tmp == NULL)
+				break;
+			addDefun(tmp->word, paramDefun(tmp->next, true));
 		}
 		tmp = tmp->next;
 	}
@@ -54,7 +87,7 @@ void CallGraph::printDefun() const
 {
 	Defun* tmp = firstDefun;
 	while(tmp){
-		printf("%s\n", tmp->function);
+		printf("%s  %d\n", tmp->function, tmp->number);
 		tmp = tmp->next;
 	}
 }
