@@ -1,15 +1,15 @@
 #ifndef LEXEM_HPP
 #define LEXEM_HPP
 
-enum statement{
-  Word,
-  Splitter,
-  String
+enum Statement{
+  WORD,
+  SPLITTER,
+  STRING
 };
 
 struct Lexem{
   char* word;
-  statement type;
+  Statement type;
   Lexem* next;
 };
 

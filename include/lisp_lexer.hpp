@@ -25,7 +25,7 @@ private:
   int cIsSplitter() const;
   void increaseBuffer();
   void symbolToBuffer();
-  void createLexem(statement);
+  void createLexem(Statement);
   void baseStatement();
   void wordStatement();
   void stringStatement();

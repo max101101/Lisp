@@ -60,7 +60,7 @@ void Lexer::symbolToBuffer()
   buf.pos++;
 }
 
-void Lexer::createLexem(statement type)
+void Lexer::createLexem(Statement type)
 {
   int i = 0;
   (*current) = new Lexem;
@@ -90,7 +90,7 @@ void Lexer::baseStatement()
   }
   if(cIsSplitter()){
     symbolToBuffer();
-    createLexem(Splitter);
+    createLexem(SPLITTER);
     return;
   }
   if(c == '#'){
@@ -105,12 +105,12 @@ void Lexer::wordStatement()
   for(;;){
     c = getc(file);
     if(c == EOF){
-      createLexem(Word);
+      createLexem(WORD);
       return;
     }
     if(cIsSplitter()){
       ungetc(c, file);
-      createLexem(Word);
+      createLexem(WORD);
       return;
     }
     symbolToBuffer();
@@ -122,7 +122,7 @@ void Lexer::stringStatement()
   for(;;){
     c = getc(file);
     if((c == '"') || (c == EOF)){
-      createLexem(String);
+      createLexem(STRING);
       break;
     }
     symbolToBuffer();
@@ -158,5 +158,5 @@ void Lexer::specialStatement()
       }
       symbolToBuffer();
   }
-  createLexem(String);
+  createLexem(STRING);
 }
