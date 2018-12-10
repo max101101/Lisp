@@ -16,11 +16,11 @@ class Lexer{
   Lexem* first;
   Lexem** current;
   const char* splitter;
-  FILE* file;
+  char* file;
 public:
   Lexer();
   ~Lexer();
-  Lexem* start(FILE*);
+  Lexem* start(char*);
 private: 
   int cIsSplitter() const;
   void increaseBuffer();

@@ -13,7 +13,7 @@ const char* SQLSELECT = "SELECT * FROM progs";
 
 static int callback(void *data, int argc, char **argv, char **col_name){
 	printf("%s = %s\n", col_name[0], argv[0]);
-	//CallGraph().create(Lexer().start(argv[1]));
+	CallGraph().create(Lexer().start(argv[1]));
 	printf("\n");
 	return 0;
 }
@@ -140,7 +140,8 @@ int main(int argc, char** argv)
 		if(dir_to_db(argv[2], "", db)){
 			file_to_db(argv[2], db);
 		}
-	}else{
+	}	
+	if(strcmp(argv[1],"select") == 0){
 		if(sqlite3_exec(db, SQLSELECT, callback, 0, &err)){
 			fprintf(stdout, "DB Sql Error: %s\n", err);
 			sqlite3_free(err);

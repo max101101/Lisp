@@ -19,10 +19,11 @@ Lexer::~Lexer()
   delete [] buf.buf;
 }
 
-Lexem* Lexer::start(FILE* input)
+Lexem* Lexer::start(char* input)
 {
   file = input;
-  while((c = getc(file)) != EOF){
+  while((c = file[0]) != 0){
+	file += 1;
     baseStatement();
   }
   return first;
@@ -103,13 +104,14 @@ void Lexer::wordStatement()
 {
   symbolToBuffer();
   for(;;){
-    c = getc(file);
-    if(c == EOF){
+    c = file[0];
+	file += 1;
+    if(c == 0){
       createLexem(WORD);
       return;
     }
     if(cIsSplitter()){
-      ungetc(c, file);
+      file -= 1;
       createLexem(WORD);
       return;
     }
@@ -120,8 +122,9 @@ void Lexer::wordStatement()
 void Lexer::stringStatement()
 {
   for(;;){
-    c = getc(file);
-    if((c == '"') || (c == EOF)){
+    c = file[0];
+	file += 1;
+    if((c == '"') || (c == 0)){
       createLexem(STRING);
       break;
     }
@@ -132,8 +135,9 @@ void Lexer::stringStatement()
 void Lexer::commentStatement()
 {
   for(;;){
-    c = getc(file);
-    if((c == '\n') || (c == EOF))
+    c = file[0];
+	file += 1;
+    if((c == '\n') || (c == 0))
       break;
   }
 }
@@ -141,19 +145,22 @@ void Lexer::commentStatement()
 void Lexer::specialStatement()
 {
   symbolToBuffer();
-  c = getc(file);
+  c = file[0];
+  file += 1;
   symbolToBuffer();
   if(c == '\\'){
-    c = getc(file);
+    c = file[0];
+	file += 1;
     symbolToBuffer();
   }
   while(true){
-      c = getc(file);
-      if(c == EOF){
+      c = file[0];
+      file += 1;
+      if(c == 0){
         break;
       }
       if(cIsSplitter()){
-        ungetc(c, file);
+        file -= 1;
 		break;
       }
       symbolToBuffer();
