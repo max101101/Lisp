@@ -1,2 +1,3 @@
-To build use "make"
-To test files in lisp/ use "sh run.sh"
+* To build use "make"
+* To insert ./prog insert dirname/filename //~db already filled
+* To create call graphs ./prog select > outputfile
