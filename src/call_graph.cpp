@@ -25,7 +25,7 @@ void CallGraph::create(Lexem* first)
 	createDefun();
 	initGraph();
 	createGraph();
-	//printGraph();
+	printGraph();
 }
 
 void CallGraph::initGraph()
