@@ -1,4 +1,4 @@
-MODULESNAMES = lexem.cpp lisp_lexer.cpp call_graph.cpp
+MODULESNAMES = lexem.cpp lisp_lexer.cpp call_graph.cpp sqlite.cpp
 INCLUDEPATH = include
 MODULESPATH = src
 OBJPATH = obj
