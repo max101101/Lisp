@@ -2,7 +2,7 @@
 #include <lisp_lexer.hpp>
 #include <lexem.hpp>
 #include <call_graph.hpp>
-#include <sqlite3.hpp>
+#include <sqlite3.h>
 #include <string.h>
 #include <dirent.h>
 

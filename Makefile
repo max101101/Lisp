@@ -1,12 +1,16 @@
-MODULESNAMES = lexem.cpp lisp_lexer.cpp call_graph.cpp sqlite.cpp
+CPPMODULESNAMES = lexem.cpp lisp_lexer.cpp call_graph.cpp
+CMODULESNAMES = sqlite3.c
 INCLUDEPATH = include
 MODULESPATH = src
 OBJPATH = obj
 MAINMODULE = main.cpp
 PROGNAME = prog
-SRCMODULES = $(MODULESNAMES:%=$(MODULESPATH)/%)
-OBJMODULES = $(MODULESNAMES:%.cpp=$(OBJPATH)/%.o)
+CPPSRCMODULES = $(CPPMODULESNAMES:%=$(MODULESPATH)/%)
+CSRCMODULES = $(CMODULESNAMES:%=$(MODULESPATH)/%)
+CPPOBJMODULES = $(CPPMODULESNAMES:%.cpp=$(OBJPATH)/%.o)
+COBJMODULES = $(CMODULESNAMES:%.c=$(OBJPATH)/%.o)
 CXXFLAGS = -g -Wall
+CFLAGS = -g -Wall
 
 .PHONY: all clean
 
@@ -16,7 +20,7 @@ ifneq (clean, $(MAKECMDGOALS))
 -include deps.mk
 endif
 
-deps.mk: $(SRCMODULES)
+deps.mk: $(CPPSRCMODULES)
 	$(CXX) -I$(INCLUDEPATH) -MM $^ > $@
 
 $(OBJPATH):
@@ -25,7 +29,10 @@ $(OBJPATH):
 $(OBJPATH)/%.o: $(MODULESPATH)/%.cpp $(INCLUDEPATH)/%.hpp
 	$(CXX) $(CXXFLAGS) -I$(INCLUDEPATH) -c $< -o $@
 
-$(PROGNAME): $(MAINMODULE) $(OBJMODULES)
+$(OBJPATH)/%.o: $(MODULESPATH)/%.c $(INCLUDEPATH)/%.h
+	$(CC) $(CFLAGS) -I$(INCLUDEPATH) -c $< -o $@
+
+$(PROGNAME): $(MAINMODULE) $(CPPOBJMODULES) $(COBJMODULES)
 	$(CXX) $(CXXFLAGS) -I$(INCLUDEPATH) $^ -o $@
 
 clean:
