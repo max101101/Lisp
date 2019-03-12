@@ -5,6 +5,7 @@
 #include <sqlite3.h>
 #include <string.h>
 #include <dirent.h>
+#include <time.h>
 
 const char* DATABASE = "database.dblite";
 const char* SQLCREATE = "CREATE TABLE IF NOT EXISTS progs (path text,prog text);";
@@ -20,6 +21,7 @@ struct cb_data{
 
 static int callback(void *data, int argc, char **argv, char **col_name){
 	struct cb_data* cb_data = static_cast<struct cb_data*>(data);
+	CallGraph().create(Lexer().start(argv[1]));
 	printf("%s compare with %s\n", cb_data->name, argv[0]);
 	return 0;
 }
@@ -139,7 +141,7 @@ void compare_file(char* file_path, sqlite3* db)
 	cb_data->cg = cg.GetGraph();
 	char *err = 0;
 	if(sqlite3_exec(db, SQLSELECT, callback, cb_data, &err)){
-		fprintf(stdout, "DB Sql Error: %s\n", err);
+		fprintf(stderr, "DB Sql Error: %s\n", err);
 		sqlite3_free(err);
 		sqlite3_close(db);
 		return;
@@ -200,21 +202,22 @@ int compare_dir(char* name_dir, const char* path, sqlite3* db)
 
 int main(int argc, char** argv)
 {
+	unsigned long start = clock();
 	if(argc < 2){
-		printf("Error: wrong params\nprog [compare|insert] [dir]\n");
+		fprintf(stderr, "Error: wrong params\nprog [compare|insert] [dir]\n");
 		return 1;
 	}
 	//prepare DB
 	sqlite3 *db = 0;
 	char *err = 0;
 	if(sqlite3_open(DATABASE, &db)){
-		fprintf(stdout, "DB open Error: %s\n", sqlite3_errmsg(db));
+		fprintf(stderr, "DB open Error: %s\n", sqlite3_errmsg(db));
 		sqlite3_close(db);
 		return 1;
 	}
 	//prepare table
 	if(sqlite3_exec(db, SQLCREATE, 0, 0, &err)){
-		fprintf(stdout, "DB Sql Error: %s\n", err);
+		fprintf(stderr, "DB Sql Error: %s\n", err);
 		sqlite3_free(err);
 		sqlite3_close(db);
 		return 1;
@@ -223,7 +226,8 @@ int main(int argc, char** argv)
 	if(strcmp(argv[1],"insert") == 0){
 		//prepare dir_path
 		if(argc != 3){
-			printf("Dir missing\n");
+			fprintf(stderr, "Dir missing\n");
+			return 1;
 		}
 		int len = strlen(argv[2]);
 		if(argv[2][len-1] == '/'){
@@ -236,7 +240,8 @@ int main(int argc, char** argv)
 	//compare with db
 	if(strcmp(argv[1],"compare") == 0){
 		if(argc != 3){
-			printf("Dir missing\n");
+			fprintf(stderr, "Dir missing\n");
+			return 1;
 		}
 		int len = strlen(argv[2]);
 		if(argv[2][len-1] == '/'){
@@ -247,5 +252,6 @@ int main(int argc, char** argv)
 		}
 	}
 	sqlite3_close(db);
+	printf("Time = %lu\n", clock() - start);
 	return 0;
 }
