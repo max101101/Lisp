@@ -28,6 +28,16 @@ void CallGraph::create(Lexem* first)
 	//printGraph();
 }
 
+int CallGraph::GetSize()
+{
+	return sizeGraph;
+}
+
+Function* CallGraph::GetGraph()
+{
+	return Graph;
+}
+
 void CallGraph::initGraph()
 {
 	Defun* tmp = firstDefun;

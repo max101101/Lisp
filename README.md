@@ -1,4 +1,4 @@
 * To build use "make"
-* To insert use "./prog insert dirname/filename" //~db already filled
-* To create call graphs use "./prog select > outputfile"
+* To insert use "./prog insert dirname|filename" //~db already filled
+* To compare use "./prog compare dirname|filename"
 * To clean use "make clean"

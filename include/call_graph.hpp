@@ -41,6 +41,8 @@ public:
 	CallGraph();
 	~CallGraph();
 	void create(Lexem*);
+	int GetSize();
+	Function* GetGraph();
 private:
 	void initGraph();
 	Lexem* skipQuote(Lexem*);
