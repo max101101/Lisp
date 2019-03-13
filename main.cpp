@@ -52,6 +52,7 @@ void file_to_db(char* file_path, sqlite3* db)
 {
 	//File Read
 	if(check_file_path(file_path) != 0){
+		printf("Skip:%s\n", file_path);
 		return;
 	}
 	FILE* f = fopen(file_path, "r");
