@@ -28,7 +28,7 @@ static int callback(void *data, int argc, char **argv, char **col_name){
 
 int check_file_path(char* file_path)
 {
-	// .txt .lsp .ss .LSP
+	// .txt .lsp .ss .LSP .lisp
 	int len = strlen(file_path);
 	if(len < 4){
 		return 1;
@@ -43,6 +43,9 @@ int check_file_path(char* file_path)
 		return 0;
 	}
 	if(strcmp(&file_path[len-4],".LSP") == 0){
+		return 0;
+	}
+	if(strcmp(&file_path[len-5],".lisp") == 0){
 		return 0;
 	}
 	return 1;
