@@ -12,6 +12,8 @@ const char* SQLCREATE = "CREATE TABLE IF NOT EXISTS progs (path text,prog text);
 const char* SQLINSERT = "INSERT INTO progs VALUES (?, ?);";
 const char* SQLSELECT = "SELECT * FROM progs";
 
+const double THRESHOLD = 0.3;
+
 struct cb_data{
 	char* name;
 	char* text;
@@ -21,7 +23,9 @@ struct cb_data{
 
 static int callback(void *data, int argc, char **argv, char **col_name){
 	struct cb_data* cb_data = static_cast<struct cb_data*>(data);
-	CallGraph().create(Lexer().start(argv[1]));
+	CallGraph cg;
+	cg.create(Lexer().start(argv[1]));
+	vector<Result> res = cg.Compare(cb_data->cg, cb_data->size);
 	printf("%s compare with %s\n", cb_data->name, argv[0]);
 	return 0;
 }
@@ -55,7 +59,7 @@ void file_to_db(char* file_path, sqlite3* db)
 {
 	//File Read
 	if(check_file_path(file_path) != 0){
-		printf("Skip:%s\n", file_path);
+		printf("Skip insert:%s\n", file_path);
 		return;
 	}
 	FILE* f = fopen(file_path, "r");
@@ -120,10 +124,11 @@ int dir_to_db(char* name_dir, const char* path, sqlite3* db)
 	return 0;
 }
 
-void compare_file(char* file_path, sqlite3* db)
+void compare_file(char* file_path, sqlite3* db, char is_insert)
 {
 	//File Read
 	if(check_file_path(file_path) != 0){
+		printf("Skip compare:%s\n", file_path);
 		return;
 	}
 	FILE* f = fopen(file_path, "r");
@@ -150,26 +155,27 @@ void compare_file(char* file_path, sqlite3* db)
 		sqlite3_close(db);
 		return;
 	}
-	/*
 	//DB work
-	sqlite3_stmt *stmt;
-	const char *test;
-	// Insert data item into myTable
-	int rc = sqlite3_prepare(db, SQLINSERT, strlen(SQLINSERT), &stmt, &test);
-	if(rc == SQLITE_OK){
-		// bind the value
-		sqlite3_bind_text(stmt, 1, file_path, strlen(file_path), 0);
-		sqlite3_bind_text(stmt, 2, data, strlen(data), 0);
-		// commit
-		sqlite3_step(stmt);
-		sqlite3_finalize(stmt);
-	}*/
+	if(is_insert){
+		sqlite3_stmt *stmt;
+		const char *test;
+		// Insert data item into myTable
+		int rc = sqlite3_prepare(db, SQLINSERT, strlen(SQLINSERT), &stmt, &test);
+		if(rc == SQLITE_OK){
+			// bind the value
+			sqlite3_bind_text(stmt, 1, file_path, strlen(file_path), 0);
+			sqlite3_bind_text(stmt, 2, data, strlen(data), 0);
+			// commit
+			sqlite3_step(stmt);
+			sqlite3_finalize(stmt);
+		}
+	}
 	delete cb_data;
 	delete[] data;
 	fclose(f);
 }
 
-int compare_dir(char* name_dir, const char* path, sqlite3* db)
+int compare_dir(char* name_dir, const char* path, sqlite3* db, char is_insert)
 {
 	//current dir path
 	int len = strlen(path);
@@ -189,13 +195,13 @@ int compare_dir(char* name_dir, const char* path, sqlite3* db)
 			continue;
 		}
 		//check if not dir
-		if(compare_dir(name->d_name, dir_path, db) == 1){
+		if(compare_dir(name->d_name, dir_path, db, is_insert) == 1){
 			int len = strlen(dir_path);
 			len += strlen(name->d_name);
 			len += 1;
 			char* file_path = new char [len];
 			sprintf(file_path, "%s%s", dir_path, name->d_name);
-			compare_file(file_path, db);
+			compare_file(file_path, db, is_insert);
 			delete [] file_path;
 		}
 	}
@@ -229,7 +235,7 @@ int main(int argc, char** argv)
 	//inserting in db
 	if(strcmp(argv[1],"insert") == 0){
 		//prepare dir_path
-		if(argc != 3){
+		if(argc < 3){
 			fprintf(stderr, "Dir missing\n");
 			return 1;
 		}
@@ -243,16 +249,20 @@ int main(int argc, char** argv)
 	}
 	//compare with db
 	if(strcmp(argv[1],"compare") == 0){
-		if(argc != 3){
+		if(argc < 3){
 			fprintf(stderr, "Dir missing\n");
 			return 1;
+		}
+		char is_insert = 0;
+		if(argc >= 4){
+			is_insert = !strcmp(argv[3], "-I");
 		}
 		int len = strlen(argv[2]);
 		if(argv[2][len-1] == '/'){
 			argv[2][len-1] = 0;
 		}
-		if(compare_dir(argv[2], "", db)){
-			compare_file(argv[2], db);
+		if(compare_dir(argv[2], "", db, is_insert)){
+			compare_file(argv[2], db, is_insert);
 		}
 	}
 	sqlite3_close(db);

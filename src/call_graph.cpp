@@ -38,6 +38,26 @@ Function* CallGraph::GetGraph()
 	return Graph;
 }
 
+Result CallGraph::funcCompare(Function src, Function dst)
+{
+	Result r;
+	r.src_name = src.name;
+	r.dst_name = dst.name;
+	r.prob = 0;
+	return r;
+}
+
+vector<Result> CallGraph::Compare(Function* src, int size)
+{
+	vector<Result> a;
+	for(int i = 0; i < size; i++){
+		for(int j = 0; j < sizeGraph; j++){
+			a.push_back(funcCompare(src[i], Graph[j]));
+		}
+	}
+	return a;
+}
+
 void CallGraph::initGraph()
 {
 	Defun* tmp = firstDefun;

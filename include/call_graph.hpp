@@ -31,6 +31,12 @@ struct Function{
 	vector<FunctionCall> list;
 };
 
+struct Result{
+	char* src_name;
+	char* dst_name;
+	double prob;
+};
+
 class CallGraph{
 	Lexem* firstLexem;
 	Defun* firstDefun;
@@ -43,11 +49,13 @@ public:
 	void create(Lexem*);
 	int GetSize();
 	Function* GetGraph();
+	vector<Result> Compare(Function*, int);
 private:
 	void initGraph();
 	Lexem* skipQuote(Lexem*);
 	void addCall(const char*, int);
 	void parseFunction(int, Lexem*, bool);
+	Result funcCompare(Function, Function);
 	void createGraph();
 	void addDefun(const char*, int);
 	int paramDefun(Lexem*, bool) const;
