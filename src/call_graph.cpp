@@ -38,24 +38,75 @@ Function* CallGraph::GetGraph()
 	return Graph;
 }
 
+double CallGraph::paramStartProb(int a)
+{
+	if(a < 0){
+		a = 0 - a;
+	}
+	switch(a){
+	case 0:
+		return 1;
+	case 1:
+		return 0.9;
+	default:
+		return 0;
+	}
+}
+
+double CallGraph::funcProb(FunctionCall src, FunctionCall dst)
+{
+	if(src.type != dst.type){
+		return 0;
+	}
+	if(src.type == STANDART){
+		if(strcmp(src.name, dst.name) != 0){
+			return 0;
+		}
+	}
+	double startProb = paramStartProb(src.paramNumber - dst.paramNumber);
+	double a = src.callNumber;
+	double b = dst.callNumber;
+	double mult = a < b ? a/b : b/a;
+	return startProb*mult;
+}
+
 Result CallGraph::funcCompare(Function src, Function dst)
 {
 	Result r;
 	r.src_name = src.name;
 	r.dst_name = dst.name;
 	r.prob = 0;
+	double startProb = paramStartProb(src.paramNumber - dst.paramNumber);
+	int maxCall = src.list.size() < dst.list.size() ? dst.list.size(): src.list.size();
+	startProb /= maxCall;
+	for(int i = 0; i < src.list.size(); i++){
+		double maxProb = 0;
+		for(int j = 0; j < dst.list.size(); j++){
+			double res = funcProb(src.list[i], dst.list[j]);
+			maxProb = res > maxProb ? res : maxProb;
+		}
+		r.prob += maxProb * startProb;
+	}
 	return r;
 }
 
-vector<Result> CallGraph::Compare(Function* src, int size)
+vector<Result> CallGraph::Compare(Function* src, int size, double threshold)
 {
-	vector<Result> a;
+	vector<Result> res;
 	for(int i = 0; i < size; i++){
+		Result r;
+		r.prob = 0;
 		for(int j = 0; j < sizeGraph; j++){
-			a.push_back(funcCompare(src[i], Graph[j]));
+			Result tmp = funcCompare(src[i], Graph[j]);
+			if(tmp.prob > r.prob){
+				r = tmp;
+			}	
+		}
+		if(r.prob > threshold){
+			res.push_back(r);
 		}
 	}
-	return a;
+	return res;
 }
 
 void CallGraph::initGraph()
@@ -266,10 +317,11 @@ void CallGraph::printGraph() const
 {
 	for(int i = 0; i < sizeGraph; i++){
 		printf("%s:\n", Graph[i].name);
-		for(int j = 0; j < Graph[i].list.size(); j++){
-			printf("\t%s %d\n", Graph[i].list[j].name,
-								Graph[i].list[j].callNumber);
-		}
+		/*for(int j = 0; j < Graph[i].list.size(); j++){
+			printf("\t%s %d %d\n", Graph[i].list[j].name,
+								Graph[i].list[j].callNumber,
+								Graph[i].list[j].type);
+		}*/
 	}
 }
 

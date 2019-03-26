@@ -49,12 +49,15 @@ public:
 	void create(Lexem*);
 	int GetSize();
 	Function* GetGraph();
-	vector<Result> Compare(Function*, int);
+	vector<Result> Compare(Function*, int, double);
+	void printGraph() const;
 private:
 	void initGraph();
 	Lexem* skipQuote(Lexem*);
 	void addCall(const char*, int);
 	void parseFunction(int, Lexem*, bool);
+	double paramStartProb(int);
+	double funcProb(FunctionCall, FunctionCall);
 	Result funcCompare(Function, Function);
 	void createGraph();
 	void addDefun(const char*, int);
@@ -62,7 +65,6 @@ private:
 	void createDefun();
 	int findDefun(const char*);
 	void printDefun() const;
-	void printGraph() const;
 	void deleteDefun();
 	void deleteGraph();
 };

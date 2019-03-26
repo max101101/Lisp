@@ -8,11 +8,12 @@
 #include <time.h>
 
 const char* DATABASE = "database.dblite";
-const char* SQLCREATE = "CREATE TABLE IF NOT EXISTS progs (path text,prog text);";
+const char* SQLCREATE = "CREATE TABLE IF NOT EXISTS progs (path text,prog text, PRIMARY KEY (path));";
 const char* SQLINSERT = "INSERT INTO progs VALUES (?, ?);";
 const char* SQLSELECT = "SELECT * FROM progs";
 
-const double THRESHOLD = 0.3;
+const double FUNC_THRESHOLD = 0.75;
+const double PROG_THRESHOLD = 0.5;
 
 struct cb_data{
 	char* name;
@@ -23,10 +24,23 @@ struct cb_data{
 
 static int callback(void *data, int argc, char **argv, char **col_name){
 	struct cb_data* cb_data = static_cast<struct cb_data*>(data);
+	if(cb_data->size == 0){
+		return 0;
+	}
 	CallGraph cg;
 	cg.create(Lexer().start(argv[1]));
-	vector<Result> res = cg.Compare(cb_data->cg, cb_data->size);
-	printf("%s compare with %s\n", cb_data->name, argv[0]);
+	vector<Result> res = cg.Compare(cb_data->cg, cb_data->size, FUNC_THRESHOLD);
+	if((double)res.size()/cb_data->size > PROG_THRESHOLD){
+		double prob = 0;
+		for(int i = 0; i < res.size(); i++){
+			prob += res[i].prob;
+		}
+		prob /= res.size();
+		printf("%s compare with %s result: %lf\n", cb_data->name, argv[0], prob);
+		/*for(int i = 0; i < res.size(); i++){
+			printf("%s and %s got %lf\n", res[i].src_name, res[i].dst_name, res[i].prob);
+		}*/
+	}
 	return 0;
 }
 
@@ -69,9 +83,10 @@ void file_to_db(char* file_path, sqlite3* db)
 	// Determine file size
 	fseek(f, 0, SEEK_END);
 	size_t size = ftell(f);
-	char* data = new char[size];
+	char* data = new char[size+1];
 	rewind(f);
 	fread(data, sizeof(char), size, f);
+	data[size] = 0;
 	//DB work
 	sqlite3_stmt *stmt;
 	const char *test;
@@ -128,7 +143,7 @@ void compare_file(char* file_path, sqlite3* db, char is_insert)
 {
 	//File Read
 	if(check_file_path(file_path) != 0){
-		printf("Skip compare:%s\n", file_path);
+		//printf("Skip compare:%s\n", file_path);
 		return;
 	}
 	FILE* f = fopen(file_path, "r");
@@ -138,9 +153,10 @@ void compare_file(char* file_path, sqlite3* db, char is_insert)
 	// Determine file size
 	fseek(f, 0, SEEK_END);
 	size_t size = ftell(f);
-	char* data = new char[size];
+	char* data = new char[size+1];
 	rewind(f);
 	fread(data, sizeof(char), size, f);
+	data[size] = 0;
 	CallGraph cg;
 	cg.create(Lexer().start(data));
 	struct cb_data* cb_data = new struct cb_data;
