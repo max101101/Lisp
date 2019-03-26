@@ -13,7 +13,7 @@ const char* SQLINSERT = "INSERT INTO progs VALUES (?, ?);";
 const char* SQLSELECT = "SELECT * FROM progs";
 
 const double FUNC_THRESHOLD = 0.75;
-const double PROG_THRESHOLD = 0.5;
+const double PROG_THRESHOLD = 0.6;
 
 struct cb_data{
 	char* name;
@@ -31,15 +31,11 @@ static int callback(void *data, int argc, char **argv, char **col_name){
 	cg.create(Lexer().start(argv[1]));
 	vector<Result> res = cg.Compare(cb_data->cg, cb_data->size, FUNC_THRESHOLD);
 	if((double)res.size()/cb_data->size > PROG_THRESHOLD){
-		double prob = 0;
+		printf("%s alike %s\n", cb_data->name, argv[0]);
 		for(int i = 0; i < res.size(); i++){
-			prob += res[i].prob;
-		}
-		prob /= res.size();
-		printf("%s compare with %s result: %lf\n", cb_data->name, argv[0], prob);
-		/*for(int i = 0; i < res.size(); i++){
 			printf("%s and %s got %lf\n", res[i].src_name, res[i].dst_name, res[i].prob);
-		}*/
+		}
+		printf("\n\n");
 	}
 	return 0;
 }

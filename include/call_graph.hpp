@@ -57,6 +57,7 @@ private:
 	void addCall(const char*, int);
 	void parseFunction(int, Lexem*, bool);
 	double paramStartProb(int);
+	double callStartProb(int);
 	double funcProb(FunctionCall, FunctionCall);
 	Result funcCompare(Function, Function);
 	void createGraph();
