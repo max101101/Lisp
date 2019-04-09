@@ -4,3 +4,4 @@ obj
 deps.mk
 prog
 prog.dSYM
+a.out

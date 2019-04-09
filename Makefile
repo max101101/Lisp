@@ -30,7 +30,7 @@ $(OBJPATH)/%.o: $(MODULESPATH)/%.cpp $(INCLUDEPATH)/%.hpp
 	$(CXX) $(CXXFLAGS) -I$(INCLUDEPATH) -c $< -o $@
 
 $(OBJPATH)/%.o: $(MODULESPATH)/%.c $(INCLUDEPATH)/%.h
-	$(CC) $(CFLAGS) -I$(INCLUDEPATH) -c $< -o $@
+	gcc $(CFLAGS) -I$(INCLUDEPATH) -c $< -o $@
 
 $(PROGNAME): $(MAINMODULE) $(CPPOBJMODULES) $(COBJMODULES)
 	$(CXX) $(CXXFLAGS) -I$(INCLUDEPATH) $^ -o $@
