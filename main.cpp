@@ -31,11 +31,11 @@ static int callback(void *data, int argc, char **argv, char **col_name){
 	cg.create(Lexer().start(argv[1]));
 	vector<Result> res = cg.Compare(cb_data->cg, cb_data->size, FUNC_THRESHOLD);
 	if((double)res.size()/cb_data->size > PROG_THRESHOLD){
-		printf("%s alike %s\n", cb_data->name, argv[0]);
+		printf("%s alike %s\r\n", cb_data->name, argv[0]);
 		for(int i = 0; i < res.size(); i++){
-			printf("%s and %s got %lf\n", res[i].src_name, res[i].dst_name, res[i].prob);
+			printf("%s and %s got %lf\r\n", res[i].src_name, res[i].dst_name, res[i].prob);
 		}
-		printf("\n\n");
+		printf("\r\n\r\n");
 	}
 	return 0;
 }
@@ -69,7 +69,7 @@ void file_to_db(char* file_path, sqlite3* db)
 {
 	//File Read
 	if(check_file_path(file_path) != 0){
-		printf("Skip insert:%s\n", file_path);
+		printf("Skip insert:%s\r\n", file_path);
 		return;
 	}
 	FILE* f = fopen(file_path, "r");
@@ -162,7 +162,7 @@ void compare_file(char* file_path, sqlite3* db, char is_insert)
 	cb_data->cg = cg.GetGraph();
 	char *err = 0;
 	if(sqlite3_exec(db, SQLSELECT, callback, cb_data, &err)){
-		fprintf(stderr, "DB Sql Error: %s\n", err);
+		fprintf(stderr, "DB Sql Error: %s\r\n", err);
 		sqlite3_free(err);
 		sqlite3_close(db);
 		return;
@@ -226,20 +226,20 @@ int main(int argc, char** argv)
 {
 	unsigned long start = clock();
 	if(argc < 2){
-		fprintf(stderr, "Error: wrong params\nprog [compare|insert] [dir]\n");
+		fprintf(stderr, "Error: wrong params\r\nprog [compare|insert] [dir]\r\n");
 		return 1;
 	}
 	//prepare DB
 	sqlite3 *db = 0;
 	char *err = 0;
 	if(sqlite3_open(DATABASE, &db)){
-		fprintf(stderr, "DB open Error: %s\n", sqlite3_errmsg(db));
+		fprintf(stderr, "DB open Error: %s\r\n", sqlite3_errmsg(db));
 		sqlite3_close(db);
 		return 1;
 	}
 	//prepare table
 	if(sqlite3_exec(db, SQLCREATE, 0, 0, &err)){
-		fprintf(stderr, "DB Sql Error: %s\n", err);
+		fprintf(stderr, "DB Sql Error: %s\r\n", err);
 		sqlite3_free(err);
 		sqlite3_close(db);
 		return 1;
@@ -248,7 +248,7 @@ int main(int argc, char** argv)
 	if(strcmp(argv[1],"insert") == 0){
 		//prepare dir_path
 		if(argc < 3){
-			fprintf(stderr, "Dir missing\n");
+			fprintf(stderr, "Dir missing\r\n");
 			return 1;
 		}
 		int len = strlen(argv[2]);
@@ -262,7 +262,7 @@ int main(int argc, char** argv)
 	//compare with db
 	if(strcmp(argv[1],"compare") == 0){
 		if(argc < 3){
-			fprintf(stderr, "Dir missing\n");
+			fprintf(stderr, "Dir missing\r\n");
 			return 1;
 		}
 		char is_insert = 0;
@@ -278,6 +278,6 @@ int main(int argc, char** argv)
 		}
 	}
 	sqlite3_close(db);
-	printf("Time = %lu\n", clock() - start);
+	printf("Time = %lu\r\n", clock() - start);
 	return 0;
 }

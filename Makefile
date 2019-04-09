@@ -36,4 +36,4 @@ $(PROGNAME): $(MAINMODULE) $(CPPOBJMODULES) $(COBJMODULES)
 	$(CXX) $(CXXFLAGS) -I$(INCLUDEPATH) $^ -o $@
 
 clean:
-	rm -rf $(OBJPATH) $(PROGNAME) deps.mk $(PROGNAME).dSYM
+	rm -rf $(OBJPATH) $(PROGNAME) deps.mk $(PROGNAME).dSYM a.out

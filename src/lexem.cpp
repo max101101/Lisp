@@ -4,7 +4,7 @@
 void printLexem(const Lexem* pointer, FILE* stream)
 {
   while(pointer){
-    fprintf(stream, "%s  %d\n", pointer->word, pointer->type);
+    fprintf(stream, "%s  %d\r\n", pointer->word, pointer->type);
     pointer = pointer->next;
   }
 }

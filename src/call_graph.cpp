@@ -326,7 +326,7 @@ void CallGraph::printDefun() const
 {
 	Defun* tmp = firstDefun;
 	while(tmp){
-		printf("%s  %d\n", tmp->function, tmp->number);
+		printf("%s  %d\r\n", tmp->function, tmp->number);
 		tmp = tmp->next;
 	}
 }
@@ -334,7 +334,7 @@ void CallGraph::printDefun() const
 void CallGraph::printGraph() const
 {
 	for(int i = 0; i < sizeGraph; i++){
-		printf("%s:\n", Graph[i].name);
+		printf("%s:\r\n", Graph[i].name);
 		/*for(int j = 0; j < Graph[i].list.size(); j++){
 			printf("\t%s %d %d\n", Graph[i].list[j].name,
 								Graph[i].list[j].callNumber,
