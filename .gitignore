@@ -5,3 +5,4 @@ deps.mk
 prog
 prog.dSYM
 a.out
+out.txt

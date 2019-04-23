@@ -12,8 +12,8 @@ const char* SQLCREATE = "CREATE TABLE IF NOT EXISTS progs (path text,prog text, 
 const char* SQLINSERT = "INSERT INTO progs VALUES (?, ?);";
 const char* SQLSELECT = "SELECT * FROM progs";
 
-const double FUNC_THRESHOLD = 0.4;
-const double PROG_THRESHOLD = 0.4;
+const double FUNC_THRESHOLD = 0.6;
+const double PROG_THRESHOLD = 0.5;
 
 struct cb_data{
 	char* name;
