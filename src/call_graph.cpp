@@ -25,7 +25,7 @@ void CallGraph::create(Lexem* first)
 	createDefun();
 	initGraph();
 	createGraph();
-	//printGraph();
+	printGraph();
 }
 
 int CallGraph::GetSize()
@@ -169,6 +169,9 @@ void CallGraph::addCall(const char* name, int i)
 Lexem* CallGraph::skipQuote(Lexem* lexem)
 {
 	int balance = 0;
+	if((strcmp(lexem->word, "(")) != 0){
+		return lexem;
+	}
 	while(lexem){
 		if(((strcmp(lexem->word, ")")) == 0) && (lexem->type == SPLITTER)){
 			if(--balance == 0){
