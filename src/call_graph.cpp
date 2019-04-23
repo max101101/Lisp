@@ -120,7 +120,7 @@ vector<Result> CallGraph::Compare(Function* src, int size, double threshold)
 				r = tmp;
 			}	
 		}
-		if(r.prob > threshold){
+		if(r.prob >= threshold){
 			res.push_back(r);
 		}
 	}
@@ -335,11 +335,11 @@ void CallGraph::printGraph() const
 {
 	for(int i = 0; i < sizeGraph; i++){
 		printf("%s:\r\n", Graph[i].name);
-		/*for(int j = 0; j < Graph[i].list.size(); j++){
+		for(int j = 0; j < Graph[i].list.size(); j++){
 			printf("\t%s %d %d\n", Graph[i].list[j].name,
 								Graph[i].list[j].callNumber,
 								Graph[i].list[j].type);
-		}*/
+		}
 	}
 }
 

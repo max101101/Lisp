@@ -12,8 +12,8 @@ const char* SQLCREATE = "CREATE TABLE IF NOT EXISTS progs (path text,prog text, 
 const char* SQLINSERT = "INSERT INTO progs VALUES (?, ?);";
 const char* SQLSELECT = "SELECT * FROM progs";
 
-const double FUNC_THRESHOLD = 0.7;
-const double PROG_THRESHOLD = 0.6;
+const double FUNC_THRESHOLD = 0.4;
+const double PROG_THRESHOLD = 0.4;
 
 struct cb_data{
 	char* name;
@@ -30,7 +30,7 @@ static int callback(void *data, int argc, char **argv, char **col_name){
 	CallGraph cg;
 	cg.create(Lexer().start(argv[1]));
 	vector<Result> res = cg.Compare(cb_data->cg, cb_data->size, FUNC_THRESHOLD);
-	if((double)res.size()/cb_data->size > PROG_THRESHOLD){
+	if((double)res.size()/cb_data->size >= PROG_THRESHOLD){
 		printf("%s alike %s\r\n", cb_data->name, argv[0]);
 		for(int i = 0; i < res.size(); i++){
 			printf("%s and %s got %lf\r\n", res[i].src_name, res[i].dst_name, res[i].prob);
