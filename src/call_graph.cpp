@@ -25,7 +25,7 @@ void CallGraph::create(Lexem* first)
 	createDefun();
 	initGraph();
 	createGraph();
-	printGraph();
+	//printGraph();
 }
 
 int CallGraph::GetSize()
@@ -100,8 +100,10 @@ Result CallGraph::funcCompare(Function src, Function dst)
 	for(int i = 0; i < src.list.size(); i++){
 		double maxProb = 0;
 		for(int j = 0; j < dst.list.size(); j++){
-			double res = funcProb(src.list[i], dst.list[j]);
-			maxProb = res > maxProb ? res : maxProb;
+			double res1 = funcProb(src.list[i], dst.list[j]);
+			double res2 = funcProb(dst.list[j], src.list[i]);
+			double maxRes = res1 > res2 ? res1 : res2;
+			maxProb = maxRes > maxProb ? maxRes : maxProb;
 		}
 		r.prob += maxProb * startProb;
 	}
