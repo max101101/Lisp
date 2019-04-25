@@ -53,21 +53,12 @@ double CallGraph::paramStartProb(int a)
 	}
 }
 
-double CallGraph::callStartProb(int a)
+double CallGraph::callStartProb(double a, double b)
 {
-	if(a < 0){
-		a = 0 - a;
+	if(a > 0 && b > 0){
+		return a < b ? a/b : b/a;
 	}
-	switch(a){
-	case 0:
-		return 1;
-	case 1:
-		return 0.9;
-	case 2:
-		return 0.7;
-	default:
-		return 0;
-	}
+	return 0;
 }
 
 double CallGraph::funcProb(FunctionCall src, FunctionCall dst)
@@ -94,7 +85,7 @@ Result CallGraph::funcCompare(Function src, Function dst)
 	r.dst_name = dst.name;
 	r.prob = 0;
 	double startProb = paramStartProb(src.paramNumber - dst.paramNumber);
-	double callProb = callStartProb(src.list.size() - dst.list.size());
+	double callProb = callStartProb(src.list.size(), dst.list.size());
 	startProb *= callProb;
 	startProb /= src.list.size();
 	for(int i = 0; i < src.list.size(); i++){
