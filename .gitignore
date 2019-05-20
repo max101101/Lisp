@@ -6,3 +6,4 @@ prog
 prog.dSYM
 a.out
 out.txt
+logfile.txt
