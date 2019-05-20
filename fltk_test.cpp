@@ -11,51 +11,52 @@
 #include <stdlib.h>
 #include <fcntl.h>
 
-Fl_Input * input1;
-Fl_Input * input2;
-Fl_Input * input3;
-Fl_Input * input4;
-Fl_Input * input5;
-Fl_Input * input6;
+struct Gui{
+	Fl_Window* window;
+	Fl_Text_Buffer* buf;
+	Fl_Text_Display* disp;
+	Fl_Button* button_start;
+	Fl_Check_Button* button_prog;
+	Fl_Check_Button* button_compare;
+	Fl_Check_Button* button_insert;
+	Fl_Input* input_db;
+	Fl_Input* input_log;
+	Fl_Input* input_thf;
+	Fl_Input* input_thp;
+	Fl_Input* input_name;
+	Fl_Input* input_path;
+}gui;
 
 int main(int argc, char **argv) {
-  Fl_Window *window = new Fl_Window(1024,768);
-  window->label("Lisp Antiplagiarism");
-  Fl_Text_Buffer *buf = new Fl_Text_Buffer(0,0);
-  Fl_Text_Display *disp = new Fl_Text_Display(400, 0, 624, 768);
-  disp->buffer(buf);
-	/*
-  char buffer[10240];
-  int fd = open("out.txt", O_RDONLY, 0777);
-  int i = read(fd, buffer, 10000);
-  buffer[i] = 0;
-  buf->text(buffer);
-*/
-  Fl_Button *button = new Fl_Button(150, 550, 100, 100, "Start");
-  button->type(FL_NORMAL_BUTTON);
-  Fl_Check_Button *button2 = new Fl_Check_Button(0, 230, 30, 30, "Show program");
-  button->type(FL_NORMAL_BUTTON);
-  input1 = new Fl_Input(0, 0, 200, 40, "Database name");
-  input1->value("database.dblite");
-  input2 = new Fl_Input(0, 40, 200, 40, "Log file name");
-  input2->value("logfile.txt");
-  input3 = new Fl_Input(0, 100, 200, 40, "Function threshold");
-  input3->value("0.5");
-  input4 = new Fl_Input(0, 140, 200, 40, "Program threshold");
-  input4->value("0.5");
-  input5 = new Fl_Input(0, 260, 200, 40, "Program name");
-  input5->value("prog.lsp");
-  input1->align(FL_ALIGN_RIGHT);
-  input2->align(FL_ALIGN_RIGHT);
-  input3->align(FL_ALIGN_RIGHT);
-  input4->align(FL_ALIGN_RIGHT);
-  input5->align(FL_ALIGN_RIGHT);
-  Fl_Check_Button *button3 = new Fl_Check_Button(0, 350, 30, 30, "Insert programs");
-  Fl_Check_Button *button4 = new Fl_Check_Button(0, 380, 30, 30, "Compare programs");
-  input6 = new Fl_Input(0, 410, 200, 40, "Program location");
-  input6->value("Path/");
-  input6->align(FL_ALIGN_RIGHT);
-  window->end();
-  window->show(argc, argv);
+  gui.window = new Fl_Window(1024,768);
+  gui.window->label("Lisp Antiplagiarism");
+  gui.buf = new Fl_Text_Buffer(0,0);
+  gui.disp = new Fl_Text_Display(400, 0, 624, 768);
+  gui.disp->buffer(gui.buf);
+  gui.button_start = new Fl_Button(150, 550, 100, 100, "Start");
+  gui.button_start->type(FL_NORMAL_BUTTON);
+  gui.button_prog = new Fl_Check_Button(0, 230, 30, 30, "Show program");
+  gui.button_insert = new Fl_Check_Button(0, 350, 30, 30, "Insert programs");
+  gui.button_compare = new Fl_Check_Button(0, 380, 30, 30, "Compare programs");
+  gui.input_db = new Fl_Input(0, 0, 200, 40, "Database name");
+  gui.input_db->value("database.dblite");
+  gui.input_log = new Fl_Input(0, 40, 200, 40, "Log file name");
+  gui.input_log->value("logfile.txt");
+  gui.input_thf = new Fl_Input(0, 100, 200, 40, "Function threshold");
+  gui.input_thf->value("0.5");
+  gui.input_thp = new Fl_Input(0, 140, 200, 40, "Program threshold");
+  gui.input_thp->value("0.5");
+  gui.input_name = new Fl_Input(0, 260, 200, 40, "Program name");
+  gui.input_name->value("prog.lsp");
+  gui.input_path = new Fl_Input(0, 410, 200, 40, "Program location");
+  gui.input_path->value("Path/");
+  gui.input_db->align(FL_ALIGN_RIGHT);
+  gui.input_log->align(FL_ALIGN_RIGHT);
+  gui.input_thf->align(FL_ALIGN_RIGHT);
+  gui.input_thp->align(FL_ALIGN_RIGHT);
+  gui.input_name->align(FL_ALIGN_RIGHT);
+  gui.input_path->align(FL_ALIGN_RIGHT);
+  gui.window->end();
+  gui.window->show(argc, argv);
   return Fl::run();
 }
