@@ -6,14 +6,42 @@
 #include <string.h>
 #include <dirent.h>
 #include <time.h>
+#include <FL/Fl.H>
+#include <FL/Fl_Window.H>
+#include <FL/Fl_Box.H>
+#include <FL/Fl_Button.H>
+#include <FL/Fl_Check_Button.H>
+#include <Fl/Fl_Multiline_Output.H>
+#include <Fl/Fl_Input.H>
+#include <Fl/Fl_Text_Display.H>
+#include <Fl/Fl_Text_Buffer.H>
+#include <unistd.h>
+#include <stdlib.h>
+#include <fcntl.h>
 
-const char* DATABASE = "database.dblite";
+struct Gui{
+	Fl_Window* window;
+	Fl_Text_Buffer* buf;
+	Fl_Text_Display* disp;
+	Fl_Button* button_start;
+	Fl_Check_Button* button_prog;
+	Fl_Check_Button* button_compare;
+	Fl_Check_Button* button_insert;
+	Fl_Input* input_db;
+	Fl_Input* input_log;
+	Fl_Input* input_thf;
+	Fl_Input* input_thp;
+	Fl_Input* input_name;
+	Fl_Input* input_path;
+}gui;
+
 const char* SQLCREATE = "CREATE TABLE IF NOT EXISTS progs (path text,prog text, PRIMARY KEY (path));";
 const char* SQLINSERT = "INSERT INTO progs VALUES (?, ?);";
 const char* SQLSELECT = "SELECT * FROM progs";
 
-const double FUNC_THRESHOLD = 0.6;
-const double PROG_THRESHOLD = 0.5;
+double FUNC_THRESHOLD = 0;
+double PROG_THRESHOLD = 0;
+FILE* LOG = NULL;
 
 struct cb_data{
 	char* name;
@@ -31,11 +59,23 @@ static int callback(void *data, int argc, char **argv, char **col_name){
 	cg.create(Lexer().start(argv[1]));
 	vector<Result> res = cg.Compare(cb_data->cg, cb_data->size, FUNC_THRESHOLD);
 	if((double)res.size()/cb_data->size >= PROG_THRESHOLD){
-		printf("%s alike %s\r\n", cb_data->name, argv[0]);
-		for(int i = 0; i < res.size(); i++){
-			printf("%s and %s got %lf\r\n", res[i].src_name, res[i].dst_name, res[i].prob);
+		char buf[1024];
+		for(int i = 0; i < 1024; i++){
+			buf[i] = 0;
 		}
-		printf("\r\n\r\n");
+		sprintf(buf, "%s alike %s\r\n", cb_data->name, argv[0]);
+		fputs(buf, LOG);
+		gui.buf->append(buf);
+		for(int i = 0; i < res.size(); i++){
+			for(int j = 0; j < 1024; j++){
+				buf[j] = 0;
+			}
+			sprintf(buf, "%s and %s got %lf\r\n", res[i].src_name, res[i].dst_name, res[i].prob);
+			fputs(buf, LOG);
+			gui.buf->append(buf);
+		}
+		fputs("\r\n\r\n", LOG);
+		gui.buf->append("\r\n\r\n");
 	}
 	return 0;
 }
@@ -69,7 +109,12 @@ void file_to_db(char* file_path, sqlite3* db)
 {
 	//File Read
 	if(check_file_path(file_path) != 0){
-		printf("Skip insert:%s\r\n", file_path);
+		char buf[1024];
+		for(int i = 0; i < 1024; i++){
+			buf[i] = 0;
+		}
+		sprintf(buf, "Skip insert:%s\r\n", file_path);
+		gui.buf->append(buf);
 		return;
 	}
 	FILE* f = fopen(file_path, "r");
@@ -162,7 +207,7 @@ void compare_file(char* file_path, sqlite3* db, char is_insert)
 	cb_data->cg = cg.GetGraph();
 	char *err = 0;
 	if(sqlite3_exec(db, SQLSELECT, callback, cb_data, &err)){
-		fprintf(stderr, "DB Sql Error: %s\r\n", err);
+		gui.buf->append("DB Sql Error\r\n");
 		sqlite3_free(err);
 		sqlite3_close(db);
 		return;
@@ -222,62 +267,106 @@ int compare_dir(char* name_dir, const char* path, sqlite3* db, char is_insert)
 	return 0;
 }
 
-int main(int argc, char** argv)
+void start(Fl_Widget *w, void* data)
 {
-	unsigned long start = clock();
-	if(argc < 2){
-		fprintf(stderr, "Error: wrong params\r\nprog [compare|insert] [dir]\r\n");
-		return 1;
-	}
 	//prepare DB
 	sqlite3 *db = 0;
 	char *err = 0;
-	if(sqlite3_open(DATABASE, &db)){
-		fprintf(stderr, "DB open Error: %s\r\n", sqlite3_errmsg(db));
+	if(sqlite3_open(gui.input_db->value(), &db)){
+		gui.buf->text("DB open Error\r\n");
 		sqlite3_close(db);
-		return 1;
 	}
 	//prepare table
 	if(sqlite3_exec(db, SQLCREATE, 0, 0, &err)){
-		fprintf(stderr, "DB Sql Error: %s\r\n", err);
+		gui.buf->text("DB Sql Error\r\n");
 		sqlite3_free(err);
 		sqlite3_close(db);
-		return 1;
 	}
-	//inserting in db
-	if(strcmp(argv[1],"insert") == 0){
-		//prepare dir_path
-		if(argc < 3){
-			fprintf(stderr, "Dir missing\r\n");
-			return 1;
-		}
-		int len = strlen(argv[2]);
-		if(argv[2][len-1] == '/'){
-			argv[2][len-1] = 0;
-		}
-		if(dir_to_db(argv[2], "", db)){
-			file_to_db(argv[2], db);
-		}
+	FUNC_THRESHOLD = atof(gui.input_thf->value());
+	PROG_THRESHOLD = atof(gui.input_thp->value());
+	LOG = fopen(gui.input_log->value(), "w");
+	gui.buf->text("");
+	//output program
+	if(gui.button_prog->value()){
+		//select_file(db, gui.input_name->value());
 	}
 	//compare with db
-	if(strcmp(argv[1],"compare") == 0){
-		if(argc < 3){
-			fprintf(stderr, "Dir missing\r\n");
-			return 1;
+	if(gui.button_compare->value()){
+		char is_insert = gui.button_insert->value();
+		const char* path_c = gui.input_path->value();
+		int len = strlen(path_c);
+		char* path = new char[len+1];
+		for(int i = 0; i < len+1; i++){
+			path[i] = path_c[i];
 		}
-		char is_insert = 0;
-		if(argc >= 4){
-			is_insert = !strcmp(argv[3], "-I");
+		if(len < 1){
+			sqlite3_close(db);
+			return;
 		}
-		int len = strlen(argv[2]);
-		if(argv[2][len-1] == '/'){
-			argv[2][len-1] = 0;
+		if(path[len-1] == '/' || path[len-1] == '\\'){
+			path[len-1] = 0;
 		}
-		if(compare_dir(argv[2], "", db, is_insert)){
-			compare_file(argv[2], db, is_insert);
+		if(compare_dir(path, "", db, is_insert)){
+			compare_file(path, db, is_insert);
 		}
+		delete [] path;
+	}
+	//inserting in db
+	else if(gui.button_insert->value()){
+		//prepare dir_path
+		const char* path_c = gui.input_path->value();
+		int len = strlen(path_c);
+		char* path = new char[len+1];
+		for(int i = 0; i < len+1; i++){
+			path[i] = path_c[i];
+		}
+		if(len < 1){
+			sqlite3_close(db);
+			return;
+		}
+		if(path[len-1] == '/' || path[len-1] == '\\'){
+			path[len-1] = 0;
+		}
+		if(dir_to_db(path, "", db)){
+			file_to_db(path, db);
+		}
+		delete [] path;
 	}
 	sqlite3_close(db);
-	printf("Time = %lu\r\n", clock() - start);
-	return 0;
+	fclose(LOG);
+}
+
+int main(int argc, char **argv) {
+  gui.window = new Fl_Window(1024,768);
+  gui.window->label("Lisp Antiplagiarism");
+  gui.buf = new Fl_Text_Buffer(0,0);
+  gui.disp = new Fl_Text_Display(400, 0, 624, 768);
+  gui.disp->buffer(gui.buf);
+  gui.button_start = new Fl_Button(150, 550, 100, 100, "Start");
+  gui.button_start->type(FL_NORMAL_BUTTON);
+  gui.button_start->callback(start, NULL);
+  gui.button_prog = new Fl_Check_Button(0, 230, 30, 30, "Show program");
+  gui.button_insert = new Fl_Check_Button(0, 350, 30, 30, "Insert programs");
+  gui.button_compare = new Fl_Check_Button(0, 380, 30, 30, "Compare programs");
+  gui.input_db = new Fl_Input(0, 0, 200, 40, "Database name");
+  gui.input_db->value("database.dblite");
+  gui.input_log = new Fl_Input(0, 40, 200, 40, "Log file name");
+  gui.input_log->value("logfile.txt");
+  gui.input_thf = new Fl_Input(0, 100, 200, 40, "Function threshold");
+  gui.input_thf->value("0.8");
+  gui.input_thp = new Fl_Input(0, 140, 200, 40, "Program threshold");
+  gui.input_thp->value("0.2");
+  gui.input_name = new Fl_Input(0, 260, 200, 40, "Program name");
+  gui.input_name->value("prog.lsp");
+  gui.input_path = new Fl_Input(0, 410, 200, 40, "Program location");
+  gui.input_path->value("Path/");
+  gui.input_db->align(FL_ALIGN_RIGHT);
+  gui.input_log->align(FL_ALIGN_RIGHT);
+  gui.input_thf->align(FL_ALIGN_RIGHT);
+  gui.input_thp->align(FL_ALIGN_RIGHT);
+  gui.input_name->align(FL_ALIGN_RIGHT);
+  gui.input_path->align(FL_ALIGN_RIGHT);
+  gui.window->end();
+  gui.window->show(argc, argv);
+  return Fl::run();
 }

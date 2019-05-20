@@ -33,7 +33,7 @@ $(OBJPATH)/%.o: $(MODULESPATH)/%.c $(INCLUDEPATH)/%.h
 	gcc $(CFLAGS) -I$(INCLUDEPATH) -c $< -o $@
 
 $(PROGNAME): $(MAINMODULE) $(CPPOBJMODULES) $(COBJMODULES)
-	$(CXX) $(CXXFLAGS) -I$(INCLUDEPATH) $^ -o $@
+	$(CXX) $(CXXFLAGS) -std=c++11 `fltk-config --ldflags` -I$(INCLUDEPATH) $^ -o $@
 
 clean:
 	rm -rf $(OBJPATH) $(PROGNAME) deps.mk $(PROGNAME).dSYM a.out
