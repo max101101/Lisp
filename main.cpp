@@ -38,6 +38,7 @@ struct Gui{
 const char* SQLCREATE = "CREATE TABLE IF NOT EXISTS progs (path text,prog text, PRIMARY KEY (path));";
 const char* SQLINSERT = "INSERT INTO progs VALUES (?, ?);";
 const char* SQLSELECT = "SELECT * FROM progs";
+const char* SQLSELECTPROG = "SELECT prog FROM progs WHERE path = ?";
 
 double FUNC_THRESHOLD = 0;
 double PROG_THRESHOLD = 0;
@@ -267,6 +268,38 @@ int compare_dir(char* name_dir, const char* path, sqlite3* db, char is_insert)
 	return 0;
 }
 
+void select_file(sqlite3* db, const char* name)
+{
+	//DB work
+	sqlite3_stmt *stmt;
+	const char *test;
+	// Insert data item into myTable
+	fputs(name, LOG);
+	fputs("\r\n", LOG);
+	gui.buf->append(name);
+	gui.buf->append("\r\n");
+	int rc = sqlite3_prepare(db, SQLSELECTPROG, strlen(SQLSELECTPROG), &stmt, &test);
+	if(rc == SQLITE_OK){
+		// bind the value
+		sqlite3_bind_text(stmt, 1, name, strlen(name), 0);
+		// commit
+		rc = sqlite3_step(stmt);
+		int ncols = sqlite3_column_count(stmt);
+		while(rc == SQLITE_ROW){
+			for(int i = 0; i < ncols; i++){
+				const unsigned char* text = sqlite3_column_text(stmt,i);
+				fputs((const char*)text, LOG);
+				gui.buf->append((const char*)text);
+				gui.buf->append(" ");
+			}
+			fputs("\r\n\r\n", LOG);
+			gui.buf->append("\r\n\r\n");
+			rc = sqlite3_step(stmt);
+		}
+		sqlite3_finalize(stmt);
+	}
+}
+
 void start(Fl_Widget *w, void* data)
 {
 	//prepare DB
@@ -288,7 +321,7 @@ void start(Fl_Widget *w, void* data)
 	gui.buf->text("");
 	//output program
 	if(gui.button_prog->value()){
-		//select_file(db, gui.input_name->value());
+		select_file(db, gui.input_name->value());
 	}
 	//compare with db
 	if(gui.button_compare->value()){
