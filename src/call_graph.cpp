@@ -206,11 +206,11 @@ void CallGraph::parseFunction(int i, Lexem* lexem, bool isScheme)
 			balance++;
 			if(tmp->next == NULL)
 				return;
-			if(tmp->next->type == WORD){
+			if(tmp->next->type == WORD1){
 				addCall(tmp->next->word, i);
 			}
 		} else if((((strcmp(tmp->word, "'")) == 0) && (tmp->type == SPLITTER))||
-				(((strcmp(tmp->word, "quote")) == 0) && (tmp->type == WORD))){
+				(((strcmp(tmp->word, "quote")) == 0) && (tmp->type == WORD1))){
 			addCall("quote", i);
 			tmp = skipQuote(tmp->next);
 			balance++;
@@ -225,14 +225,14 @@ void CallGraph::createGraph()
 	Lexem* tmp = firstLexem;
 	int i = 0;
 	while(tmp){
-		if(((strcmp(tmp->word, "defun")) == 0) && (tmp->type == WORD)){
+		if(((strcmp(tmp->word, "defun")) == 0) && (tmp->type == WORD1)){
 			tmp = tmp->next;
 			if(tmp == NULL)
 				break;
 			parseFunction(i, tmp->next, false);
 			i++;
 		}
-		if(((strcmp(tmp->word, "define")) == 0) && (tmp->type == WORD)){
+		if(((strcmp(tmp->word, "define")) == 0) && (tmp->type == WORD1)){
 			tmp = tmp->next;
 			if(tmp == NULL)
 				break;
@@ -288,13 +288,13 @@ void CallGraph::createDefun()
 {
 	Lexem* tmp = firstLexem;
 	while(tmp){
-		if(((strcmp(tmp->word, "defun")) == 0) && (tmp->type == WORD)){
+		if(((strcmp(tmp->word, "defun")) == 0) && (tmp->type == WORD1)){
 			tmp = tmp->next;
 			if(tmp == NULL)
 				break;
 			addDefun(tmp->word, paramDefun(tmp->next, false));
 		}
-		if(((strcmp(tmp->word, "define")) == 0) && (tmp->type == WORD)){
+		if(((strcmp(tmp->word, "define")) == 0) && (tmp->type == WORD1)){
 			tmp = tmp->next;
 			if(tmp == NULL)
 				break;

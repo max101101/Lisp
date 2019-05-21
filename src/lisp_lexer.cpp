@@ -107,12 +107,12 @@ void Lexer::wordStatement()
     c = file[0];
 	file += 1;
     if(c == 0){
-      createLexem(WORD);
+      createLexem(WORD1);
       return;
     }
     if(cIsSplitter()){
       file -= 1;
-      createLexem(WORD);
+      createLexem(WORD1);
       return;
     }
     symbolToBuffer();

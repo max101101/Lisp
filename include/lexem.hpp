@@ -1,8 +1,7 @@
-#ifndef LEXEM_HPP
-#define LEXEM_HPP
+#pragma once
 
 enum Statement{
-  WORD,
+  WORD1,
   SPLITTER,
   STRING
 };
@@ -15,5 +14,3 @@ struct Lexem{
 
 void printLexem(const Lexem*, FILE*);
 void deleteLexem(Lexem*);
-
-#endif

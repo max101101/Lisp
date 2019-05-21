@@ -8,14 +8,11 @@
 #include <time.h>
 #include <FL/Fl.H>
 #include <FL/Fl_Window.H>
-#include <FL/Fl_Box.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Check_Button.H>
-#include <Fl/Fl_Multiline_Output.H>
 #include <Fl/Fl_Input.H>
 #include <Fl/Fl_Text_Display.H>
 #include <Fl/Fl_Text_Buffer.H>
-#include <unistd.h>
 #include <stdlib.h>
 #include <fcntl.h>
 
