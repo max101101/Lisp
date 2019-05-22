@@ -65,17 +65,23 @@ static int callback(void *data, int argc, char **argv, char **col_name){
 			buf[i] = 0;
 		}
 		sprintf(buf, "%s alike %s\r\n", cb_data->name, argv[0]);
-		fputs(buf, LOG);
+		if(LOG){
+			fputs(buf, LOG);
+		}
 		gui.buf->append(buf);
 		for(int i = 0; i < res.size(); i++){
 			for(int j = 0; j < 1024; j++){
 				buf[j] = 0;
 			}
 			sprintf(buf, "%s and %s got %lf\r\n", res[i].src_name, res[i].dst_name, res[i].prob);
-			fputs(buf, LOG);
+			if(LOG){
+				fputs(buf, LOG);
+			}
 			gui.buf->append(buf);
 		}
-		fputs("\r\n\r\n", LOG);
+		if(LOG){
+			fputs("\r\n\r\n", LOG);
+		}
 		gui.buf->append("\r\n\r\n");
 	}
 	return 0;
@@ -274,10 +280,13 @@ void select_file(sqlite3* db, const char* name)
 	sqlite3_stmt *stmt;
 	const char *test;
 	// Insert data item into myTable
-	fputs(name, LOG);
-	fputs("\r\n", LOG);
+	if(LOG){
+		fputs(name, LOG);
+		fputs(":\r\n", LOG);
+	}
 	gui.buf->append(name);
-	gui.buf->append("\r\n");
+	gui.buf->append(":\r\n");
+	int e_flag = 0;
 	int rc = sqlite3_prepare(db, SQLSELECTPROG, strlen(SQLSELECTPROG), &stmt, &test);
 	if(rc == SQLITE_OK){
 		// bind the value
@@ -286,15 +295,26 @@ void select_file(sqlite3* db, const char* name)
 		rc = sqlite3_step(stmt);
 		int ncols = sqlite3_column_count(stmt);
 		while(rc == SQLITE_ROW){
+			e_flag = 1;
 			for(int i = 0; i < ncols; i++){
 				const unsigned char* text = sqlite3_column_text(stmt,i);
-				fputs((const char*)text, LOG);
+				if(LOG){
+					fputs((const char*)text, LOG);
+				}
 				gui.buf->append((const char*)text);
 				gui.buf->append(" ");
 			}
-			fputs("\r\n\r\n", LOG);
+			if(LOG){
+				fputs("\r\n\r\n", LOG);
+			}
 			gui.buf->append("\r\n\r\n");
 			rc = sqlite3_step(stmt);
+		}
+		if(e_flag == 0){
+			if(LOG){
+				fputs("No such file\r\n\r\n", LOG);
+				gui.buf->append("No such file\r\n\r\n");
+			}
 		}
 		sqlite3_finalize(stmt);
 	}
@@ -308,12 +328,14 @@ void start(Fl_Widget *w, void* data)
 	if(sqlite3_open(gui.input_db->value(), &db)){
 		gui.buf->text("DB open Error\r\n");
 		sqlite3_close(db);
+		return;
 	}
 	//prepare table
 	if(sqlite3_exec(db, SQLCREATE, 0, 0, &err)){
 		gui.buf->text("DB Sql Error\r\n");
 		sqlite3_free(err);
 		sqlite3_close(db);
+		return;
 	}
 	FUNC_THRESHOLD = atof(gui.input_thf->value());
 	PROG_THRESHOLD = atof(gui.input_thp->value());
@@ -328,13 +350,13 @@ void start(Fl_Widget *w, void* data)
 		char is_insert = gui.button_insert->value();
 		const char* path_c = gui.input_path->value();
 		int len = strlen(path_c);
-		char* path = new char[len+1];
-		for(int i = 0; i < len+1; i++){
-			path[i] = path_c[i];
-		}
 		if(len < 1){
 			sqlite3_close(db);
 			return;
+		}
+		char* path = new char[len+1];
+		for(int i = 0; i < len+1; i++){
+			path[i] = path_c[i];
 		}
 		if(path[len-1] == '/' || path[len-1] == '\\'){
 			path[len-1] = 0;
@@ -349,13 +371,13 @@ void start(Fl_Widget *w, void* data)
 		//prepare dir_path
 		const char* path_c = gui.input_path->value();
 		int len = strlen(path_c);
-		char* path = new char[len+1];
-		for(int i = 0; i < len+1; i++){
-			path[i] = path_c[i];
-		}
 		if(len < 1){
 			sqlite3_close(db);
 			return;
+		}
+		char* path = new char[len+1];
+		for(int i = 0; i < len+1; i++){
+			path[i] = path_c[i];
 		}
 		if(path[len-1] == '/' || path[len-1] == '\\'){
 			path[len-1] = 0;
@@ -366,7 +388,9 @@ void start(Fl_Widget *w, void* data)
 		delete [] path;
 	}
 	sqlite3_close(db);
-	fclose(LOG);
+	if(LOG){
+		fclose(LOG);
+	}
 }
 
 int main(int argc, char **argv) {
