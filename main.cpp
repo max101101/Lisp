@@ -313,8 +313,8 @@ void select_file(sqlite3* db, const char* name)
 		if(e_flag == 0){
 			if(LOG){
 				fputs("No such file\r\n\r\n", LOG);
-				gui.buf->append("No such file\r\n\r\n");
 			}
+			gui.buf->append("No such file\r\n\r\n");
 		}
 		sqlite3_finalize(stmt);
 	}

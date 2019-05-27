@@ -47,7 +47,7 @@ double CallGraph::paramStartProb(int a)
 	case 0:
 		return 1;
 	case 1:
-		return 0.8;
+		return 0.7;
 	default:
 		return 0;
 	}
@@ -168,7 +168,7 @@ Lexem* CallGraph::skipQuote(Lexem* lexem)
 	while(lexem){
 		if(((strcmp(lexem->word, ")")) == 0) && (lexem->type == SPLITTER)){
 			if(--balance == 0){
-				return lexem;
+				return lexem->next;
 			}
 		} else if(((strcmp(lexem->word, "(")) == 0) && (lexem->type == SPLITTER)){
 			balance++;
@@ -213,7 +213,6 @@ void CallGraph::parseFunction(int i, Lexem* lexem, bool isScheme)
 				(((strcmp(tmp->word, "quote")) == 0) && (tmp->type == WORD))){
 			addCall("quote", i);
 			tmp = skipQuote(tmp->next);
-			balance++;
 			continue;
 		}
 		tmp = tmp->next;
